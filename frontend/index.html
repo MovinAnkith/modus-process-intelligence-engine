@@ -6,178 +6,396 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
   :root {
-    --ink: #0f172a;
+    --ink: #0b1220;
+    --ink-soft: #1e293b;
     --muted: #64748b;
-    --bg: #f8fafc;
+    --muted-soft: #94a3b8;
+    --bg: #f4f6fb;
     --card: #ffffff;
-    --accent: #2563eb;
-    --line: #e2e8f0;
-    --high: #16a34a;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --accent-grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --line: #e6e9f0;
+    --high: #059669;
+    --high-bg: #ecfdf5;
     --medium: #d97706;
-    --low: #64748b;
+    --medium-bg: #fffbeb;
+    --low: #475569;
+    --low-bg: #f1f5f9;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+    --shadow-md: 0 4px 6px rgba(15,23,42,0.04), 0 10px 20px rgba(15,23,42,0.06);
+    --shadow-lg: 0 24px 48px rgba(15,23,42,0.16);
+    --radius: 16px;
   }
   * { box-sizing: border-box; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   body {
     margin: 0;
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--ink);
+    -webkit-font-smoothing: antialiased;
   }
+
   header {
     background: var(--ink);
+    background-image: radial-gradient(circle at 12% 25%, rgba(124,58,237,0.4), transparent 45%),
+                       radial-gradient(circle at 88% 0%, rgba(79,70,229,0.4), transparent 40%);
     color: white;
-    padding: 20px 32px;
+    padding: 24px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
-  header span { color: #94a3b8; font-size: 13px; }
-  main { max-width: 1200px; margin: 0 auto; padding: 24px 32px 80px; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 40px; height: 40px; border-radius: 11px;
+    background: var(--accent-grad);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; letter-spacing: -0.02em;
+    box-shadow: 0 8px 20px rgba(79,70,229,0.45);
+  }
+  header h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  header .subtitle { color: #94a3b8; font-size: 12.5px; margin-top: 2px; }
+  header .industry-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: #e2e8f0;
+    padding: 7px 15px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 3px rgba(52,211,153,0.25); }
+
+  main { max-width: 1280px; margin: 0 auto; padding: 32px 40px 90px; }
+
+  .hero { margin-bottom: 28px; animation: fadeUp .4s ease; }
+  .hero h2 { font-size: 22px; font-weight: 750; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .hero p { color: var(--muted); font-size: 14px; margin: 0; max-width: 620px; line-height: 1.5; }
+
+  .layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; grid-column: 1 / -1; }
+  @media (max-width: 700px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 14px; animation: fadeUp .4s ease backwards;
+  }
+  .stat-card:nth-child(1) { animation-delay: .02s; }
+  .stat-card:nth-child(2) { animation-delay: .06s; }
+  .stat-card:nth-child(3) { animation-delay: .10s; }
+  .stat-card:nth-child(4) { animation-delay: .14s; }
+  .stat-icon {
+    width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon svg { width: 20px; height: 20px; }
+  .stat-card:nth-child(1) .stat-icon { background: var(--accent-soft); color: var(--accent); }
+  .stat-card:nth-child(2) .stat-icon { background: #f0fdfa; color: #0d9488; }
+  .stat-card:nth-child(3) .stat-icon { background: var(--high-bg); color: var(--high); }
+  .stat-card:nth-child(4) .stat-icon { background: var(--low-bg); color: var(--low); }
+  .stat-card .num { font-size: 26px; font-weight: 750; letter-spacing: -0.02em; line-height: 1; }
+  .stat-card .label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
 
   .toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    align-items: center;
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px; box-shadow: var(--shadow-sm); grid-column: 1 / -1;
   }
-  select, input, button {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    font-size: 14px;
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted-soft); }
+  .search-wrap input { width: 100%; padding-left: 34px; }
+  select, input {
+    padding: 9px 14px; border-radius: 9px; border: 1px solid var(--line);
+    font-size: 13.5px; background: #fafbfc; color: var(--ink-soft);
+    font-family: inherit; transition: border-color .15s, box-shadow .15s;
   }
+  select:focus, input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px var(--accent-soft); }
   button {
-    background: var(--accent);
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
+    background: var(--ink); color: white; border: none; padding: 10px 18px;
+    border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 13.5px;
+    font-family: inherit; transition: transform .1s, box-shadow .15s; display: inline-flex; align-items: center; gap: 7px;
   }
-  button:hover { background: #1d4ed8; }
-  button.secondary { background: white; color: var(--ink); border: 1px solid var(--line); }
-  button.secondary:hover { background: var(--bg); }
+  button:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  button.primary { background: var(--accent-grad); }
+  button.secondary { background: white; color: var(--ink-soft); border: 1px solid var(--line); }
+  button.secondary:hover { background: #f8fafc; }
 
-  .stats { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-  .stat-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    padding: 16px 20px; min-width: 140px;
+  .side-panel { grid-column: 2; display: flex; flex-direction: column; gap: 16px; }
+  @media (max-width: 980px) { .side-panel { grid-column: 1; flex-direction: row; flex-wrap: wrap; } }
+  .panel-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow-sm); animation: fadeUp .4s ease .1s backwards;
   }
-  .stat-card .num { font-size: 24px; font-weight: 700; }
-  .stat-card .label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .panel-card h3 { margin: 0 0 14px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12.5px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { width: 62px; color: var(--muted-soft); font-weight: 600; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 8px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+  .bar-fill.High { background: var(--high); }
+  .bar-fill.Medium { background: var(--medium); }
+  .bar-fill.Low { background: var(--low); }
+  .bar-count { width: 26px; text-align: right; font-weight: 700; color: var(--ink-soft); flex-shrink: 0; }
 
-  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
-  th, td { text-align: left; padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--line); }
-  th { background: #f1f5f9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.03em; }
-  tr:hover { background: #f8fafc; cursor: pointer; }
-  .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; color: white; }
-  .badge.High { background: var(--high); }
-  .badge.Medium { background: var(--medium); }
-  .badge.Low { background: var(--low); }
+  .cat-list { display: flex; flex-direction: column; gap: 8px; }
+  .cat-list-item { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; padding: 6px 0; }
+  .cat-list-item .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 8px; display: inline-block; }
+  .cat-list-item .name { color: var(--ink-soft); font-weight: 500; display: flex; align-items: center; }
+  .cat-list-item .count { color: var(--muted); font-weight: 600; background: #f1f5f9; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+
+  .table-wrap { grid-column: 1; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+  th, td { text-align: left; padding: 14px 18px; font-size: 13.5px; border-bottom: 1px solid var(--line); }
+  th {
+    background: #fafbfd; color: var(--muted); font-weight: 650; text-transform: uppercase;
+    font-size: 10.5px; letter-spacing: 0.06em; padding-top: 16px; padding-bottom: 16px;
+  }
+  tbody tr { cursor: pointer; transition: background .12s; }
+  tbody tr:hover { background: var(--accent-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 600; color: var(--ink-soft); }
+  .cat-chip { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: #f1f5f9; color: var(--muted); }
+
+  .badge {
+    padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.02em; display: inline-block;
+  }
+  .badge.High { background: var(--high-bg); color: var(--high); }
+  .badge.Medium { background: var(--medium-bg); color: var(--medium); }
+  .badge.Low { background: var(--low-bg); color: var(--low); }
+
+  .confidence-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; }
+  .confidence-tag.grounded { color: var(--high); }
+  .confidence-tag.limited { color: var(--medium); }
+
+  .skeleton-row td { padding: 16px 18px; }
+  .skeleton {
+    height: 14px; border-radius: 6px; background: linear-gradient(90deg, #eef1f6 0%, #f8f9fb 50%, #eef1f6 100%);
+    background-size: 800px 100%; animation: shimmer 1.4s infinite linear;
+  }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state svg { width: 44px; height: 44px; margin-bottom: 14px; color: var(--muted-soft); }
+  .empty-state p { margin: 0; font-size: 13.5px; }
 
   .modal-bg {
-    display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5);
-    align-items: center; justify-content: center; z-index: 50;
+    display: none; position: fixed; inset: 0; background: rgba(11,18,32,0.6);
+    backdrop-filter: blur(3px);
+    align-items: flex-start; justify-content: center; z-index: 50; padding: 60px 20px;
   }
   .modal-bg.open { display: flex; }
   .modal {
-    background: white; border-radius: 14px; max-width: 640px; width: 92%;
-    max-height: 85vh; overflow-y: auto; padding: 28px;
+    background: white; border-radius: 20px; max-width: 680px; width: 100%;
+    max-height: 82vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+    animation: fadeUp .25s ease;
   }
-  .modal h2 { margin-top: 0; }
-  .modal .field { margin-bottom: 14px; }
-  .modal .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 4px; }
-  .modal .field p { margin: 0; font-size: 14px; line-height: 1.5; }
-  .modal-close { float: right; background: none; color: var(--muted); font-size: 20px; padding: 0; }
-  .evidence-item { font-size: 12px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 10px; margin-bottom: 8px; }
+  .modal-header {
+    position: sticky; top: 0; background: white; padding: 26px 30px 18px;
+    border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start;
+    border-radius: 20px 20px 0 0;
+  }
+  .modal-header h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .modal-header .cat-tag { color: var(--muted); font-size: 12.5px; margin-top: 6px; font-weight: 500; }
+  .modal-close {
+    background: #f1f5f9; border: none; color: var(--muted); font-size: 16px; width: 30px; height: 30px;
+    border-radius: 8px; cursor: pointer; flex-shrink: 0; margin-left: 16px;
+  }
+  .modal-close:hover { background: #e2e8f0; }
+  .modal-body { padding: 22px 30px 30px; }
+  .modal .field { margin-bottom: 20px; }
+  .modal .field label {
+    font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em;
+    display: block; margin-bottom: 6px; font-weight: 700;
+  }
+  .modal .field p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+  .evidence-item {
+    font-size: 12.5px; color: var(--muted); background: #fafbfd; border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; line-height: 1.5;
+  }
+  .evidence-item strong { color: var(--ink-soft); }
 
-  .add-form { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .add-form {
+    display: none; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; margin-bottom: 22px; box-shadow: var(--shadow-sm); grid-column: 1 / -1; animation: fadeUp .25s ease;
+  }
   .add-form.open { display: block; }
+  .add-form h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+  .add-form .hint { color: var(--muted); font-size: 12.5px; margin: 0 0 16px; }
   .add-form .row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  .add-form input, .add-form select { flex: 1; min-width: 200px; }
-  .loading { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  .add-form input { flex: 1; min-width: 200px; }
+  .loading { color: var(--muted); font-size: 13px; padding: 10px 0 0; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .loading.success { color: var(--high); }
+  .loading.error { color: #dc2626; }
+  .spin { width: 13px; height: 13px; border: 2px solid #e2e8f0; border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>NorthStar Retail Group — Process Intelligence Engine</h1>
-  <span id="org-industry">Retail / E-commerce</span>
+  <div class="header-left">
+    <div class="logo-mark">NS</div>
+    <div>
+      <h1>NorthStar Retail Group</h1>
+      <div class="subtitle">Process Intelligence Engine</div>
+    </div>
+  </div>
+  <span class="industry-pill"><span class="live-dot"></span>Retail / E-commerce</span>
 </header>
 
 <main>
-  <div class="stats" id="stats"></div>
-
-  <div class="toolbar">
-    <select id="filter-category"><option value="">All categories</option></select>
-    <select id="filter-automation">
-      <option value="">All automation potential</option>
-      <option value="High">High</option>
-      <option value="Medium">Medium</option>
-      <option value="Low">Low</option>
-    </select>
-    <button class="secondary" onclick="loadProcesses()">Apply filters</button>
-    <button onclick="toggleAddForm()">+ Add New Process (Live Test)</button>
+  <div class="hero">
+    <h2>AI-Powered Process Intelligence</h2>
+    <p>Systematically analyzed transformation opportunity across every business process — automation potential, risks, benefits, and evidence-backed rationale, generated live by AI, not hard-coded.</p>
   </div>
 
-  <div class="add-form" id="add-form">
-    <h3 style="margin-top:0;">Add a New Process</h3>
-    <p style="color:var(--muted); font-size:13px; margin-top:-8px;">
-      This runs through the exact same analysis pipeline as the seeded 100 processes.
-      Use this for the "Process 101" surprise test.
-    </p>
-    <div class="row">
-      <input id="new-name" placeholder="Process name (e.g. Return Fraud Detection)" />
-      <input id="new-category" placeholder="Category (e.g. Order Management)" />
-    </div>
-    <div class="row">
-      <input id="new-description" placeholder="Short description (optional)" style="flex:2;" />
-      <button onclick="submitNewProcess()">Analyze & Add</button>
-    </div>
-    <div id="add-status" class="loading"></div>
-  </div>
+  <div class="layout">
+    <div class="stats" id="stats"></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Process</th>
-        <th>Category</th>
-        <th>Automation Potential</th>
-        <th>Business Benefit</th>
-        <th>Confidence</th>
-      </tr>
-    </thead>
-    <tbody id="process-rows">
-      <tr><td colspan="5" class="loading">Loading processes…</td></tr>
-    </tbody>
-  </table>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="search-box" placeholder="Search processes…" oninput="loadProcesses()" />
+      </div>
+      <select id="filter-category"><option value="">All categories</option></select>
+      <select id="filter-automation">
+        <option value="">All automation potential</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <button class="primary" onclick="toggleAddForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add New Process
+      </button>
+    </div>
+
+    <div class="add-form" id="add-form">
+      <h3>Add a New Process</h3>
+      <p class="hint">Runs through the exact same analysis pipeline used for the 100 seeded processes — use this for the live "surprise record" demo.</p>
+      <div class="row">
+        <input id="new-name" placeholder="Process name (e.g. Return Fraud Detection)" />
+        <input id="new-category" placeholder="Category (e.g. Order Management)" />
+      </div>
+      <div class="row">
+        <input id="new-description" placeholder="Short description (optional)" style="flex:2;" />
+        <button class="primary" onclick="submitNewProcess()">Analyze & Add</button>
+      </div>
+      <div id="add-status" class="loading"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Process</th>
+            <th>Category</th>
+            <th>Automation Potential</th>
+            <th>Business Benefit</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="process-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="side-panel">
+      <div class="panel-card">
+        <h3>Automation Potential</h3>
+        <div id="automation-chart"></div>
+      </div>
+      <div class="panel-card">
+        <h3>Categories</h3>
+        <div class="cat-list" id="category-list"></div>
+      </div>
+    </div>
+  </div>
 </main>
 
 <div class="modal-bg" id="modal-bg">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <h2 id="modal-title"></h2>
-    <div id="modal-body"></div>
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-title"></h2>
+        <div class="cat-tag" id="modal-category"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
 <script>
-  // ---- CONFIG ----
-  const API_BASE = "http://localhost:8000/api";
-  const ORG_ID = 1; // NorthStar Retail Group seeded as org id 1
+  const API_BASE = "https://modus-process-intelligence-engine.onrender.com/api";
+  const ORG_ID = 1;
+  const ICONS = {
+    total: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+    categories: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg>`,
+    high: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>`,
+    human: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>`,
+  };
 
-  async function loadStats(processes) {
+  function showSkeleton() {
+    const tbody = document.getElementById("process-rows");
+    tbody.innerHTML = Array.from({length: 8}).map(() => `
+      <tr class="skeleton-row">
+        <td><div class="skeleton" style="width:70%"></div></td>
+        <td><div class="skeleton" style="width:50%"></div></td>
+        <td><div class="skeleton" style="width:40px;height:20px;border-radius:999px"></div></td>
+        <td><div class="skeleton" style="width:60%"></div></td>
+        <td><div class="skeleton" style="width:80px"></div></td>
+      </tr>
+    `).join("");
+  }
+
+  function loadStats(processes) {
     const total = processes.length;
     const high = processes.filter(p => p.analysis?.automation_potential === "High").length;
     const low = processes.filter(p => p.analysis?.automation_potential === "Low").length;
     const categories = new Set(processes.map(p => p.category)).size;
     document.getElementById("stats").innerHTML = `
-      <div class="stat-card"><div class="num">${total}</div><div class="label">Processes Analyzed</div></div>
-      <div class="stat-card"><div class="num">${categories}</div><div class="label">Categories</div></div>
-      <div class="stat-card"><div class="num">${high}</div><div class="label">High AI Potential</div></div>
-      <div class="stat-card"><div class="num">${low}</div><div class="label">Human-Led</div></div>
+      <div class="stat-card"><div class="stat-icon">${ICONS.total}</div><div><div class="num">${total}</div><div class="label">Processes Analyzed</div></div></div>
+      <div class="stat-card"><div class="stat-icon">${ICONS.categories}</div><div><div class="num">${categories}</div><div class="label">Categories</div></div></div>
+      <div class="stat-card"><div class="stat-icon">${ICONS.high}</div><div><div class="num">${high}</div><div class="label">High AI Potential</div></div></div>
+      <div class="stat-card"><div class="stat-icon">${ICONS.human}</div><div><div class="num">${low}</div><div class="label">Human-Led</div></div></div>
     `;
+  }
+
+  function loadSidePanels(processes) {
+    const total = processes.length || 1;
+    const counts = { High: 0, Medium: 0, Low: 0 };
+    processes.forEach(p => { if (p.analysis?.automation_potential) counts[p.analysis.automation_potential]++; });
+    document.getElementById("automation-chart").innerHTML = ["High", "Medium", "Low"].map(level => `
+      <div class="bar-row">
+        <span class="bar-label">${level}</span>
+        <div class="bar-track"><div class="bar-fill ${level}" style="width:${(counts[level]/total*100).toFixed(0)}%"></div></div>
+        <span class="bar-count">${counts[level]}</span>
+      </div>
+    `).join("");
+
+    const catCounts = {};
+    processes.forEach(p => { catCounts[p.category] = (catCounts[p.category] || 0) + 1; });
+    const sorted = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
+    document.getElementById("category-list").innerHTML = sorted.map(([cat, count]) => `
+      <div class="cat-list-item">
+        <span class="name"><span class="dot"></span>${cat}</span>
+        <span class="count">${count}</span>
+      </div>
+    `).join("");
   }
 
   function populateCategoryFilter(processes) {
@@ -192,44 +410,63 @@
     });
   }
 
+  let allProcesses = [];
+
   async function loadProcesses() {
     const category = document.getElementById("filter-category").value;
     const automation = document.getElementById("filter-automation").value;
+    const search = document.getElementById("search-box").value.trim().toLowerCase();
+
+    if (allProcesses.length === 0) showSkeleton();
+
     let url = `${API_BASE}/processes/?organization_id=${ORG_ID}`;
     if (category) url += `&category=${encodeURIComponent(category)}`;
     if (automation) url += `&automation_potential=${encodeURIComponent(automation)}`;
 
     const res = await fetch(url);
-    const processes = await res.json();
+    let processes = await res.json();
+    allProcesses = processes;
 
-    populateCategoryFilter(processes);
-    loadStats(processes);
+    if (search) {
+      processes = processes.filter(p => p.name.toLowerCase().includes(search));
+    }
+
+    populateCategoryFilter(allProcesses);
+    loadStats(allProcesses);
+    loadSidePanels(allProcesses);
 
     const tbody = document.getElementById("process-rows");
     if (processes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" class="loading">No processes found. Run the seed script first.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <p>No processes match your filters.</p>
+        </div>
+      </td></tr>`;
       return;
     }
     tbody.innerHTML = processes.map(p => `
       <tr onclick='openModal(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
         <td>${p.name}</td>
-        <td>${p.category}</td>
+        <td><span class="cat-chip">${p.category}</span></td>
         <td>${p.analysis ? `<span class="badge ${p.analysis.automation_potential}">${p.analysis.automation_potential}</span>` : "—"}</td>
         <td>${p.analysis?.business_benefit || "—"}</td>
-        <td>${p.analysis?.confidence === "grounded" ? "✅ Grounded" : "⚠️ Limited evidence"}</td>
+        <td>${p.analysis?.confidence === "grounded"
+              ? `<span class="confidence-tag grounded">● Grounded</span>`
+              : `<span class="confidence-tag limited">● Limited evidence</span>`}</td>
       </tr>
     `).join("");
   }
 
   function openModal(p) {
     document.getElementById("modal-title").textContent = p.name;
+    document.getElementById("modal-category").textContent = p.category;
     const a = p.analysis || {};
     const evidenceHtml = (p.evidence || []).length
       ? p.evidence.map(e => `<div class="evidence-item"><strong>${e.source_title || "Source"}</strong><br>${e.snippet || ""}</div>`).join("")
-      : `<div class="evidence-item">No external evidence retrieved for this process (search API not configured or none found).</div>`;
+      : `<div class="evidence-item">No external evidence retrieved for this process.</div>`;
 
     document.getElementById("modal-body").innerHTML = `
-      <div class="field"><label>Category</label><p>${p.category}</p></div>
       <div class="field"><label>Business Purpose</label><p>${a.business_purpose || "—"}</p></div>
       <div class="field"><label>Key Activities</label><p>${a.key_activities || "—"}</p></div>
       <div class="field"><label>Current Challenges</label><p>${a.current_challenges || "—"}</p></div>
@@ -245,6 +482,7 @@
     document.getElementById("modal-bg").classList.add("open");
   }
   function closeModal() { document.getElementById("modal-bg").classList.remove("open"); }
+  document.getElementById("modal-bg").addEventListener("click", (e) => { if (e.target.id === "modal-bg") closeModal(); });
 
   function toggleAddForm() {
     document.getElementById("add-form").classList.toggle("open");
@@ -257,10 +495,12 @@
     const status = document.getElementById("add-status");
 
     if (!name || !category) {
-      status.textContent = "Please enter both a process name and category.";
+      status.className = "loading error";
+      status.innerHTML = "Please enter both a process name and category.";
       return;
     }
-    status.textContent = "Analyzing… (this calls the live AI pipeline, same as the seeded 100)";
+    status.className = "loading";
+    status.innerHTML = `<span class="spin"></span> Analyzing… (calling the live AI pipeline)`;
 
     try {
       const res = await fetch(`${API_BASE}/processes/`, {
@@ -269,13 +509,15 @@
         body: JSON.stringify({ organization_id: ORG_ID, name, category, description }),
       });
       if (!res.ok) throw new Error(await res.text());
-      status.textContent = "✅ Analyzed and added. Refreshing list…";
+      status.className = "loading success";
+      status.textContent = "✓ Analyzed and added. Refreshing list…";
       document.getElementById("new-name").value = "";
       document.getElementById("new-category").value = "";
       document.getElementById("new-description").value = "";
       await loadProcesses();
       setTimeout(() => { status.textContent = ""; toggleAddForm(); }, 1500);
     } catch (e) {
+      status.className = "loading error";
       status.textContent = "Error: " + e.message;
     }
   }
