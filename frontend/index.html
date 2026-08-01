@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NorthStar Retail — Process Intelligence Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --accent: #2563eb;
+    --line: #e2e8f0;
+    --high: #16a34a;
+    --medium: #d97706;
+    --low: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header span { color: #94a3b8; font-size: 13px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 32px 80px; }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  select, input, button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    font-size: 14px;
+  }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  button:hover { background: #1d4ed8; }
+  button.secondary { background: white; color: var(--ink); border: 1px solid var(--line); }
+  button.secondary:hover { background: var(--bg); }
+
+  .stats { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 20px; min-width: 140px;
+  }
+  .stat-card .num { font-size: 24px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+  th, td { text-align: left; padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--line); }
+  th { background: #f1f5f9; color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.03em; }
+  tr:hover { background: #f8fafc; cursor: pointer; }
+  .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; color: white; }
+  .badge.High { background: var(--high); }
+  .badge.Medium { background: var(--medium); }
+  .badge.Low { background: var(--low); }
+
+  .modal-bg {
+    display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+    align-items: center; justify-content: center; z-index: 50;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: white; border-radius: 14px; max-width: 640px; width: 92%;
+    max-height: 85vh; overflow-y: auto; padding: 28px;
+  }
+  .modal h2 { margin-top: 0; }
+  .modal .field { margin-bottom: 14px; }
+  .modal .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 4px; }
+  .modal .field p { margin: 0; font-size: 14px; line-height: 1.5; }
+  .modal-close { float: right; background: none; color: var(--muted); font-size: 20px; padding: 0; }
+  .evidence-item { font-size: 12px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 10px; margin-bottom: 8px; }
+
+  .add-form { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .add-form.open { display: block; }
+  .add-form .row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .add-form input, .add-form select { flex: 1; min-width: 200px; }
+  .loading { color: var(--muted); font-size: 13px; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>NorthStar Retail Group — Process Intelligence Engine</h1>
+  <span id="org-industry">Retail / E-commerce</span>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <select id="filter-category"><option value="">All categories</option></select>
+    <select id="filter-automation">
+      <option value="">All automation potential</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <button class="secondary" onclick="loadProcesses()">Apply filters</button>
+    <button onclick="toggleAddForm()">+ Add New Process (Live Test)</button>
+  </div>
+
+  <div class="add-form" id="add-form">
+    <h3 style="margin-top:0;">Add a New Process</h3>
+    <p style="color:var(--muted); font-size:13px; margin-top:-8px;">
+      This runs through the exact same analysis pipeline as the seeded 100 processes.
+      Use this for the "Process 101" surprise test.
+    </p>
+    <div class="row">
+      <input id="new-name" placeholder="Process name (e.g. Return Fraud Detection)" />
+      <input id="new-category" placeholder="Category (e.g. Order Management)" />
+    </div>
+    <div class="row">
+      <input id="new-description" placeholder="Short description (optional)" style="flex:2;" />
+      <button onclick="submitNewProcess()">Analyze & Add</button>
+    </div>
+    <div id="add-status" class="loading"></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Process</th>
+        <th>Category</th>
+        <th>Automation Potential</th>
+        <th>Business Benefit</th>
+        <th>Confidence</th>
+      </tr>
+    </thead>
+    <tbody id="process-rows">
+      <tr><td colspan="5" class="loading">Loading processes…</td></tr>
+    </tbody>
+  </table>
+</main>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  // ---- CONFIG ----
+  const API_BASE = "http://localhost:8000/api";
+  const ORG_ID = 1; // NorthStar Retail Group seeded as org id 1
+
+  async function loadStats(processes) {
+    const total = processes.length;
+    const high = processes.filter(p => p.analysis?.automation_potential === "High").length;
+    const low = processes.filter(p => p.analysis?.automation_potential === "Low").length;
+    const categories = new Set(processes.map(p => p.category)).size;
+    document.getElementById("stats").innerHTML = `
+      <div class="stat-card"><div class="num">${total}</div><div class="label">Processes Analyzed</div></div>
+      <div class="stat-card"><div class="num">${categories}</div><div class="label">Categories</div></div>
+      <div class="stat-card"><div class="num">${high}</div><div class="label">High AI Potential</div></div>
+      <div class="stat-card"><div class="num">${low}</div><div class="label">Human-Led</div></div>
+    `;
+  }
+
+  function populateCategoryFilter(processes) {
+    const select = document.getElementById("filter-category");
+    const existing = new Set([...select.options].map(o => o.value));
+    [...new Set(processes.map(p => p.category))].sort().forEach(cat => {
+      if (!existing.has(cat)) {
+        const opt = document.createElement("option");
+        opt.value = cat; opt.textContent = cat;
+        select.appendChild(opt);
+      }
+    });
+  }
+
+  async function loadProcesses() {
+    const category = document.getElementById("filter-category").value;
+    const automation = document.getElementById("filter-automation").value;
+    let url = `${API_BASE}/processes/?organization_id=${ORG_ID}`;
+    if (category) url += `&category=${encodeURIComponent(category)}`;
+    if (automation) url += `&automation_potential=${encodeURIComponent(automation)}`;
+
+    const res = await fetch(url);
+    const processes = await res.json();
+
+    populateCategoryFilter(processes);
+    loadStats(processes);
+
+    const tbody = document.getElementById("process-rows");
+    if (processes.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" class="loading">No processes found. Run the seed script first.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = processes.map(p => `
+      <tr onclick='openModal(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+        <td>${p.name}</td>
+        <td>${p.category}</td>
+        <td>${p.analysis ? `<span class="badge ${p.analysis.automation_potential}">${p.analysis.automation_potential}</span>` : "—"}</td>
+        <td>${p.analysis?.business_benefit || "—"}</td>
+        <td>${p.analysis?.confidence === "grounded" ? "✅ Grounded" : "⚠️ Limited evidence"}</td>
+      </tr>
+    `).join("");
+  }
+
+  function openModal(p) {
+    document.getElementById("modal-title").textContent = p.name;
+    const a = p.analysis || {};
+    const evidenceHtml = (p.evidence || []).length
+      ? p.evidence.map(e => `<div class="evidence-item"><strong>${e.source_title || "Source"}</strong><br>${e.snippet || ""}</div>`).join("")
+      : `<div class="evidence-item">No external evidence retrieved for this process (search API not configured or none found).</div>`;
+
+    document.getElementById("modal-body").innerHTML = `
+      <div class="field"><label>Category</label><p>${p.category}</p></div>
+      <div class="field"><label>Business Purpose</label><p>${a.business_purpose || "—"}</p></div>
+      <div class="field"><label>Key Activities</label><p>${a.key_activities || "—"}</p></div>
+      <div class="field"><label>Current Challenges</label><p>${a.current_challenges || "—"}</p></div>
+      <div class="field"><label>AI Opportunity</label><p>${a.ai_opportunity || "—"}</p></div>
+      <div class="field"><label>Automation Potential</label><p><span class="badge ${a.automation_potential}">${a.automation_potential || "—"}</span></p></div>
+      <div class="field"><label>Human Involvement (Future)</label><p>${a.human_involvement || "—"}</p></div>
+      <div class="field"><label>Relevant Technologies</label><p>${a.technologies || "—"}</p></div>
+      <div class="field"><label>Business Benefit</label><p>${a.business_benefit || "—"}</p></div>
+      <div class="field"><label>Risks</label><p>${a.risks || "—"}</p></div>
+      <div class="field"><label>Why the system concluded this</label><p>${a.rationale || "—"}</p></div>
+      <div class="field"><label>Supporting Evidence</label>${evidenceHtml}</div>
+    `;
+    document.getElementById("modal-bg").classList.add("open");
+  }
+  function closeModal() { document.getElementById("modal-bg").classList.remove("open"); }
+
+  function toggleAddForm() {
+    document.getElementById("add-form").classList.toggle("open");
+  }
+
+  async function submitNewProcess() {
+    const name = document.getElementById("new-name").value.trim();
+    const category = document.getElementById("new-category").value.trim();
+    const description = document.getElementById("new-description").value.trim();
+    const status = document.getElementById("add-status");
+
+    if (!name || !category) {
+      status.textContent = "Please enter both a process name and category.";
+      return;
+    }
+    status.textContent = "Analyzing… (this calls the live AI pipeline, same as the seeded 100)";
+
+    try {
+      const res = await fetch(`${API_BASE}/processes/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ organization_id: ORG_ID, name, category, description }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      status.textContent = "✅ Analyzed and added. Refreshing list…";
+      document.getElementById("new-name").value = "";
+      document.getElementById("new-category").value = "";
+      document.getElementById("new-description").value = "";
+      await loadProcesses();
+      setTimeout(() => { status.textContent = ""; toggleAddForm(); }, 1500);
+    } catch (e) {
+      status.textContent = "Error: " + e.message;
+    }
+  }
+
+  loadProcesses();
+</script>
+</body>
+</html>
