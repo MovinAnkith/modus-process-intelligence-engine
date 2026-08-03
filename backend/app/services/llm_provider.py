@@ -20,7 +20,7 @@ with EXACTLY these fields (all strings unless noted):
 - key_activities: what happens in this process (2-4 sentences)
 - current_challenges: typical problems with this process today
 - ai_opportunity: how AI could change or improve it
-- automation_potential: one of "Low", "Medium", "High"
+- automation_potential: one of "Low", "Medium", "High". Use "Low" specifically for processes requiring human judgment, empathy, negotiation, ethical decisions, or relationship management    that AI cannot safely replace - do not default to Medium/High just because some sub-tasks could be assisted by AI. Be honest and use "Low" whenever it genuinely applies.
 - human_involvement: what humans will still be responsible for in future
 - technologies: comma-separated relevant AI capabilities (e.g. "NLP, forecasting, computer vision")
 - business_benefit: expected benefit category, e.g. "Cost reduction", "Revenue growth", "Customer experience", "Speed"
